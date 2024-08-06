@@ -90,15 +90,16 @@ let gameController = (function() {
         }
 
         // for the columns
+        // this freaking thing is not working
         function columnCheck() {
             let colCount = [0, 0, 0];
-            boardMarkers.forEach(row => {
-                row.forEach(pos => {
-                    if (pos === marker) {
-                        colCount[row.indexOf(pos)]++;
+            for (let i = 0; i < boardMarkers.length; i++) {
+                for (let j = 0; j < boardMarkers.length; j++) {
+                    if (boardMarkers[i][j] === marker) {
+                        colCount[j] ++;
                     }
-                });
-            });
+                }
+            }
             if (colCount.includes(3)) {
                 console.log(colCount);
                 return true;
