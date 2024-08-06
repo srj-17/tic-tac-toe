@@ -1,23 +1,23 @@
-// making the game first playable in the terminal 
+// make a working project in the console first with foundations laid out
+// foundations -> gameboard, cell, gamecontroller
 
-let gameBoard = (function() {
+
+/* gameboard first
+** gameboard is the representation of the state of the board
+** and some other things
+*/
+let gameboard = (function() {
+    let rows = 3;
+    let columns = 3;
     let board = [];
-    let height = 3;
-    let width = 3;
 
-    let positions = []
-
-    for (let i = 0; i < width; i++) {
+    // this array represents the state of the gameboard,
+    // since state shouldn't be stored in the dom since that's not what its for
+    for (let i = 0; i < rows; i++) {
         board[i] = [];
-        for (let j = 0; j < height; j++) {
-            board[i] = board[i].concat(' '); 
-        }
-    }
-
-    for (let i = 0; i < width; i++) {
-        positions[i] = [];
-        for (let j = 0; j < height; j++) {
-            positions[i] = positions[i].concat(3 * i+j+1); 
+        for (let j = 0; j < columns; j++) {
+            // cell is an object that we will create later
+            board[i].push(cell());
         }
     }
 
@@ -25,99 +25,181 @@ let gameBoard = (function() {
         return board;
     }
 
+    function getBoardMarkers() {
+        let marks = [];
+        board.forEach(row => {
+            let rowMarks = [];
+            row.forEach(cell => {
+                rowMarks.push(cell.getMark());
+            })
+            marks.push(rowMarks);
+        });
+        return marks;
+    }
+
+    return {getBoard, getBoardMarkers};
+}) ();
+
+// cell stores the state of the particular cell
+function cell() {
+    let mark = null;
+    setMark = (myMark) => {
+        mark = myMark;
+    }
+    getMark = () => mark;
+
+    return {getMark, setMark};
+}
+
+// player should be a new object controlled by gameController but not accessible by anyone else
+function createPlayer(name, marker) {
+    let getName = () => name;
+    let getMarker = () => marker;
+    return {name, marker, getName, getMarker};
+}
+
+let gameController = (function() {
+    let playerOne = createPlayer("PlayerOne", "x");
+    let playerTwo = createPlayer("PlayerTwo", "o");
+    let activePlayer = playerOne;    
+
+    function changeActivePlayer() {
+        activePlayer = (activePlayer === playerOne) ? playerTwo : playerOne;
+        console.log(`Turn: ${activePlayer.getName()} Marker: ${activePlayer.getMarker()}`);
+    }
+
+    function checkWinner() {
+        let marker = activePlayer.getMarker();
+        let boardMarkers = gameboard.getBoardMarkers();
+
+        // for the rows 
+        function rowCheck() {
+            boardMarkers.forEach(row => {
+                // resets for each row
+                let markerCount = 0;
+                row.forEach(pos => {
+                    if(marker === pos) {
+                        markerCount++;
+                    }
+                });
+                if (markerCount === 3) {
+                    return true;
+                } 
+            });
+            return false;
+        }
+
+        // for the columns
+        function columnCheck() {
+            let colCount = [0, 0, 0];
+            boardMarkers.forEach(row => {
+                row.forEach(pos => {
+                    if (pos === marker) {
+                        colCount[row.indexOf(pos)]++;
+                    }
+                });
+            });
+            if (colCount.includes(3)) {
+                console.log(colCount);
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        // for main and cross diagonals
+        function diagonalCheck() {
+            let mainDiagonalCount = 0, crossDiagonalCount = 0;
+            for (let i = 0; i < boardMarkers.length; i++) {
+                if (marker === boardMarkers[i][i]) {
+                    mainDiagonalCount++;
+                } 
+                if (marker === boardMarkers.at(i).at(boardMarkers.length - i - 1)) {
+                    crossDiagonalCount++;
+                }
+            }
+            if (mainDiagonalCount === 3 || crossDiagonalCount === 3) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        // checkwinner returns true if any of them return true
+        console.log(`${rowCheck()} ${columnCheck()} ${diagonalCheck()}`)
+        return rowCheck() || columnCheck() || diagonalCheck();
+    }
+    
+    function playRound(position) {
+        // only for the console, I'spose
+        let board = gameboard.getBoard();
+        let positions = displayController.getPositions();
+        let rowNumber = null;
+        let cellNumber = null;
+        positions.forEach(row => {
+            if (row.includes(position)) {
+                rowNumber = positions.indexOf(row);
+                cellNumber = position - 3 * rowNumber - 1;
+            }
+        });
+        
+        let cell = board[rowNumber][cellNumber];
+        cell.setMark(activePlayer.getMarker());
+        
+        
+        // check to see the winner
+        if (checkWinner()){
+            console.log(`Winner: ${activePlayer.getName()}`)
+        };
+
+        displayController.displayBoard();
+        changeActivePlayer();
+    }
+    
+    return {playRound};
+}) ();
+
+let displayController = (function() {
+    // this we should probably get form the gameBoard rather than drawing it here
+    function displayBoard() {
+        let boardMarkers = gameboard.getBoardMarkers();
+        boardMarkers.forEach(marker => {
+            console.log(marker);
+        })
+    }
+
+    // only for console version
+    let positions = [];
+    for (let i = 0; i < 3; i++) {
+        let row = [];
+        for (let j = 0; j < 3; j++) {
+            row.push(3 * i + j + 1);
+        }
+        positions.push(row);
+    } 
+
+    function displayPositions() {
+        positions.forEach(row => {
+            console.log(row);
+        });
+    }
+
     function getPositions() {
         return positions;
     }
-
-    function updateBoard(board) {
-
-    }
-
-    return {getBoard, getPositions};
-}) ();  
-
-let playerControl = (function() {
-    let playerOne, playerTwo;
-
-    createPlayer = function(name, mark) {
-        // player is active by default
-        let active = null;
-
-        getMark = function() {
-            return this.mark;
-        }
-        isActive = function() {
-            return this.active;
-        }
-        toggleActive = function() {
-            this.active = true ? false : true;
-        }
-        return {name, mark, getMark, isActive};
-    }
-    
-    // setPlayerName should be able to handle situtations in which it doesn't get player name
-    // and it must be called later cause we haven't set the playerOneName outside function
-    function initializePlayers(firstPlayer, secondPlayer) {
-        // gives 'x' or 'o' mark randomly
-        playerOneMark = (Math.floor(Math.random() * 2) === 1)?
-                        'x' : 'o'; 
-
-        playerTwoMark = (playerOneMark === 'x') ? 'o' : 'x';
-        playerOne = createPlayer(playerOne | "player1", playerOneMark);
-        playerTwo = createPlayer(playerTwo | "player2", playerTwoMark);
-
-        // set playerOne as active player and playerTwo as inactive player
-        playerOne.toggleActive();
-        playerTwo.toggleActive().toggleActive();
-    }
-
-    function changeActivePlayer() {
-        playerOne.toggleActive();
-        playerTwo.toggleActive();
-    }
-
-    function getActivePlayer() {
-        if (playerOne.isActive()) {
-            return playerOne;
-        } else {
-            return playerTwo;
-        }
-    }
-    // first return what we want the player module
-    return {getActivePlayer, changeActivePlayer, setPlayersName}
+    return {displayBoard, displayPositions, getPositions};
 }) ();
 
-let gameController = (function() {
-    function setPlayers(player1, player2) {
-        player1 = prompt("Whose player 1?");
-        player2 = prompt("whose player 2?");
-        playerControl.setPlayersName(player1, player2);
-    }
-
-    function playRound() {
-        gameBoard.getPositions();
-        do {
-            position = prompt(`position for playing : ${playerControl.getActivePlayer().getMark()} 1-9`);
-        } while (!position || ((position > 9) || (position < 0)));
-
-        // TODO
-        gameBoard.setMark(position);
-    }
-    return {setPlayers, setMark, drawBoard}
-})
-
-let displayController = (function() {
-    function displayBoard() {
-        let board = gameBoard.getBoard();
-        for (let i = 0; i < 3; i++) {
-            console.table(board[i].join(' '));
-        }
-    }
-    return {displayBoard}
-}) ();
-
-
-// this is the "master" button that plays game
+// and everything begins with playGame
 function playGame() {
-
+    let count = 0;
+    let position
+    while(true) {
+        count++;
+        do {
+            position = Number(prompt("Position (one from the console): "))
+            displayController.displayPositions();
+        } while (position > 9 || position < 0);
+        gameController.playRound();
+    }
 }
