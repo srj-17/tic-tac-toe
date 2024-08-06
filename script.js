@@ -74,18 +74,19 @@ let gameController = (function() {
 
         // for the rows 
         function rowCheck() {
-            boardMarkers.forEach(row => {
-                // resets for each row
+            for (let i = 0; i < boardMarkers.length; i++) {
+                // reset marker count for each row
                 let markerCount = 0;
-                row.forEach(pos => {
-                    if(marker === pos) {
+                for (let j = 0; j < boardMarkers.length; j++) {
+                    if (boardMarkers[i][j] === marker) {
                         markerCount++;
                     }
-                });
+                }
+                // check marker count for each row, after it finishes checking
                 if (markerCount === 3) {
                     return true;
-                } 
-            });
+                }
+            }
             return false;
         }
 
