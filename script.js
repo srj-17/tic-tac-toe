@@ -69,7 +69,6 @@ let gameController = (function() {
 
     function changeActivePlayer() {
         activePlayer = (activePlayer === playerOne) ? playerTwo : playerOne;
-        console.log(`Turn: ${activePlayer.getName()} Marker: ${activePlayer.getMarker()}`);
     }
 
     function checkWinner() {
@@ -159,9 +158,10 @@ let gameController = (function() {
 
         displayController.displayBoard();
         changeActivePlayer();
+        console.log(`Turn: ${activePlayer.getName()} Marker: ${activePlayer.getMarker()}`);
     }
     
-    return {playRound};
+    return {playRound, checkWinner, changeActivePlayer};
 }) ();
 
 let displayController = (function() {
@@ -200,12 +200,37 @@ function playGame() {
     let count = 0;
     let position;
     console.log(gameboard.createBoard());
-    while(true) {
+    while(true && count < 9) {
         count++;
         do {
             displayController.displayPositions();
             position = Number(prompt("Position (one from the console): "))
-        } while (position > 9 || position < 0);
-        gameController.playRound(position);
+            
+            // if user presses cancel, prompt returns null
+            if (position === null) {
+                break;
+            }
+        } while (position > 9 || position < 1 || (position === ''));
+        if (position) {
+            gameController.playRound(position);
+
+            // activePlayer gets changed every round at the end, so if you want to checkWinner for this, round
+            // you have to do this
+            gameController.changeActivePlayer()
+            if (gameController.checkWinner()) {
+                break;
+            } 
+            gameController.changeActivePlayer()
+            
+            // TODO: activePlayer changes after invoking above, so it doesn't check the winner in *that* round
+        } else { /* if position null dincha bhane */
+            break;
+        }
     }
+    console.log("Thanks for playing");
 }
+
+// TODO: prevent users from reentering the already entered positions
+// TODO: end the game after winning
+//       asking them for the replay isn't necessary cause we'll do that with the ui
+// i can't change the position of changeactiveplayer() yet, but in the future, will do
