@@ -13,13 +13,17 @@ let gameboard = (function() {
 
     // this array represents the state of the gameboard,
     // since state shouldn't be stored in the dom since that's not what its for
-    for (let i = 0; i < rows; i++) {
-        board[i] = [];
-        for (let j = 0; j < columns; j++) {
-            // cell is an object that we will create later
-            board[i].push(cell());
+    function createBoard() {
+        for (let i = 0; i < rows; i++) {
+            board[i] = [];
+            for (let j = 0; j < columns; j++) {
+                // cell is an object that we will create later
+                board[i].push(cell());
+            }
         }
     }
+
+    createBoard();
 
     function getBoard() {
         return board;
@@ -37,7 +41,7 @@ let gameboard = (function() {
         return marks;
     }
 
-    return {getBoard, getBoardMarkers};
+    return {createBoard, getBoard, getBoardMarkers};
 }) ();
 
 // cell stores the state of the particular cell
@@ -102,7 +106,6 @@ let gameController = (function() {
                 }
             }
             if (colCount.includes(3)) {
-                console.log(colCount);
                 return true;
             } else {
                 return false;
@@ -128,7 +131,6 @@ let gameController = (function() {
         }
 
         // checkwinner returns true if any of them return true
-        console.log(`${rowCheck()} ${columnCheck()} ${diagonalCheck()}`)
         return rowCheck() || columnCheck() || diagonalCheck();
     }
     
@@ -136,8 +138,8 @@ let gameController = (function() {
         // only for the console, I'spose
         let board = gameboard.getBoard();
         let positions = displayController.getPositions();
-        let rowNumber = null;
-        let cellNumber = null;
+        let rowNumber;
+        let cellNumber;
         positions.forEach(row => {
             if (row.includes(position)) {
                 rowNumber = positions.indexOf(row);
@@ -145,10 +147,11 @@ let gameController = (function() {
             }
         });
         
+        console.log(`${rowNumber}, ${cellNumber}`)
         let cell = board[rowNumber][cellNumber];
         cell.setMark(activePlayer.getMarker());
         
-        
+
         // check to see the winner
         if (checkWinner()){
             console.log(`Winner: ${activePlayer.getName()}`)
@@ -195,13 +198,14 @@ let displayController = (function() {
 // and everything begins with playGame
 function playGame() {
     let count = 0;
-    let position
+    let position;
+    console.log(gameboard.createBoard());
     while(true) {
         count++;
         do {
-            position = Number(prompt("Position (one from the console): "))
             displayController.displayPositions();
+            position = Number(prompt("Position (one from the console): "))
         } while (position > 9 || position < 0);
-        gameController.playRound();
+        gameController.playRound(position);
     }
 }
