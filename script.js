@@ -48,11 +48,14 @@ let gameboard = (function() {
 function cell() {
     let mark = null;
     setMark = (myMark) => {
-        mark = myMark;
+        if (!mark) {
+            mark = myMark;
+        }
     }
     getMark = () => mark;
+    isMarked = () => mark ? true : false;
 
-    return {getMark, setMark};
+    return {getMark, setMark, isMarked};
 }
 
 // player should be a new object controlled by gameController but not accessible by anyone else
@@ -148,16 +151,19 @@ let gameController = (function() {
         
         console.log(`${rowNumber}, ${cellNumber}`)
         let cell = board[rowNumber][cellNumber];
-        cell.setMark(activePlayer.getMarker());
-        
 
-        // check to see the winner
-        if (checkWinner()){
-            console.log(`Winner: ${activePlayer.getName()}`)
-        };
-
-        displayController.displayBoard();
-        changeActivePlayer();
+        if (!cell.isMarked()) {
+            cell.setMark(activePlayer.getMarker());
+            
+    
+            // check to see the winner
+            if (checkWinner()){
+                console.log(`Winner: ${activePlayer.getName()}`)
+            };
+    
+            displayController.displayBoard();
+            changeActivePlayer();
+        }
         console.log(`Turn: ${activePlayer.getName()} Marker: ${activePlayer.getMarker()}`);
     }
     
@@ -201,28 +207,36 @@ function playGame() {
     let position;
     console.log(gameboard.createBoard());
     while(true && count < 9) {
-        count++;
         do {
             displayController.displayPositions();
             position = Number(prompt("Position (one from the console): "))
             
-            // if user presses cancel, prompt returns null
-            if (position === null) {
+            // if user presses cancel, prompt returns 0
+            if (position === 0) {
                 break;
             }
         } while (position > 9 || position < 1 || (position === ''));
         if (position) {
             gameController.playRound(position);
-
+            
             // activePlayer gets changed every round at the end, so if you want to checkWinner for this, round
             // you have to do this
             gameController.changeActivePlayer()
             if (gameController.checkWinner()) {
                 break;
             } 
+
+            // count the number of marked cells each time
+            count = 0;
+            gameboard.getBoardMarkers.forEach(row => {
+                row.forEach(cell => {
+                    if (cell.isMarked()) {
+                        count++;
+                    }
+                })
+            })
             gameController.changeActivePlayer()
             
-            // TODO: activePlayer changes after invoking above, so it doesn't check the winner in *that* round
         } else { /* if position null dincha bhane */
             break;
         }
