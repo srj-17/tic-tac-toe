@@ -148,8 +148,7 @@ let gameController = (function() {
                 cellNumber = position - 3 * rowNumber - 1;
             }
         });
-        
-        console.log(`${rowNumber}, ${cellNumber}`)
+
         let cell = board[rowNumber][cellNumber];
 
         if (!cell.isMarked()) {
@@ -228,7 +227,7 @@ function playGame() {
 
             // count the number of marked cells each time
             count = 0;
-            gameboard.getBoardMarkers.forEach(row => {
+            gameboard.getBoard().forEach(row => {
                 row.forEach(cell => {
                     if (cell.isMarked()) {
                         count++;
@@ -241,10 +240,15 @@ function playGame() {
             break;
         }
     }
+    
+    gameController.changeActivePlayer();
+    if (count === 9 && !gameController.checkWinner()) {
+        console.log("That was a draw!")
+    }
+    // if we've already broken out of the game, no need to change the active player again
+
     console.log("Thanks for playing");
 }
 
-// TODO: prevent users from reentering the already entered positions
-// TODO: end the game after winning
 //       asking them for the replay isn't necessary cause we'll do that with the ui
 // i can't change the position of changeactiveplayer() yet, but in the future, will do
