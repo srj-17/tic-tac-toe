@@ -1,7 +1,7 @@
 // make a working project in the console first with foundations laid out
 // foundations -> gameboard, cell, gamecontroller
 
-
+const ticTacBoard = document.querySelector('.tictactoe-board');
 /* gameboard first
 ** gameboard is the representation of the state of the board
 ** and some other things
@@ -172,10 +172,29 @@ let gameController = (function() {
 let displayController = (function() {
     // this we should probably get form the gameBoard rather than drawing it here
     function displayBoard() {
-        let boardMarkers = gameboard.getBoardMarkers();
-        boardMarkers.forEach(marker => {
-            console.log(marker);
-        })
+        let board = gameboard.getBoard();
+
+        // clear the board first
+        let currentMarkers = Array.from(document.querySelectorAll('.tictactoe-board div'));
+        currentMarkers.forEach(div => {
+            ticTacBoard.removeChild(div);
+        });
+        
+        board.forEach(row => {
+            row.forEach(cell => {
+                let markerContainer = document.createElement('div');
+                markerContainer.classList.add('marker-container');
+                
+                if (!cell.isMarked()) {
+                    markerContainer.textContent = ' ';
+                } else {
+                    markerContainer.textContent = cell.getMark();
+                }
+                ticTacBoard.appendChild(markerContainer);
+                
+                console.log(cell.getMark());
+            })
+        });
     }
 
     // only for console version
@@ -197,6 +216,9 @@ let displayController = (function() {
     function getPositions() {
         return positions;
     }
+
+
+    // now, changing these functions to display in the DOM
     return {displayBoard, displayPositions, getPositions};
 }) ();
 
