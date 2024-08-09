@@ -1,7 +1,10 @@
 // make a working project in the console first with foundations laid out
 // foundations -> gameboard, cell, gamecontroller
 
-const ticTacBoard = document.querySelector('.tictactoe-board');
+const container = document.querySelector('.container');
+const ticTacBoard = document.createElement('div');
+ticTacBoard.classList.add('tictactoe-board');
+
 /* gameboard first
 ** gameboard is the representation of the state of the board
 ** and some other things
@@ -137,6 +140,7 @@ let gameController = (function() {
     }
     
     function playRound(position) {
+        displayController.displayBoard();
         // only for the console, I'spose
         let board = gameboard.getBoard();
         let positions = displayController.getPositions();
@@ -172,6 +176,7 @@ let gameController = (function() {
 let displayController = (function() {
     // this we should probably get form the gameBoard rather than drawing it here
     function displayBoard() {
+        container.appendChild(ticTacBoard);
         let board = gameboard.getBoard();
 
         // clear the board first
@@ -179,11 +184,12 @@ let displayController = (function() {
         currentMarkers.forEach(div => {
             ticTacBoard.removeChild(div);
         });
-        
+
         board.forEach(row => {
             row.forEach(cell => {
                 let markerContainer = document.createElement('div');
                 markerContainer.classList.add('marker-container');
+                markerContainer.setAttribute('id', `${3 * board.indexOf(row) + row.indexOf(cell) + 1}`)
                 
                 if (!cell.isMarked()) {
                     markerContainer.textContent = ' ';
@@ -227,6 +233,8 @@ function playGame() {
     let count = 0;
     let position;
     console.log(gameboard.createBoard());
+    displayController.displayBoard();
+
     while(true && count < 9) {
         do {
             displayController.displayPositions();
