@@ -48,8 +48,9 @@ let gameboard = (function() {
                 cell.resetMark();
             })
         });
-
+        
         displayController.displayBoard();
+        gameController.resetCheckWinnerCount();
     }
 
     let positions = [];
@@ -141,8 +142,13 @@ let displayController = (function() {
         winnerDialog.showModal();
     }
 
+    function displayDraw() {
+        winnerDialog.textContent = `Draw`;
+        winnerDialog.showModal();
+    }
+
     // now, changing these functions to display in the DOM
-    return {displayBoard, swapButtons, displayWinner};
+    return {displayBoard, swapButtons, displayWinner, displayDraw};
 }) ();
 
 let gameController = (function() {
@@ -150,6 +156,12 @@ let gameController = (function() {
     let playerTwo;
     let activePlayer; 
     let board = gameboard.getBoard();
+    // required later in the draw case
+    let checkWinnerCount = 0;
+
+    function resetCheckWinnerCount() {
+        checkWinnerCount = 0;
+    }
     
     function setPlayerNames(playerOneN, playerTwoN) {
         let playerOneName = playerOneN || "PlayerOne";
@@ -250,13 +262,18 @@ let gameController = (function() {
             cell.setMark(activePlayer.getMarker());
             
             // check to see the winner
+            checkWinnerCount++;
             if (checkWinner()){
                 displayController.displayWinner(activePlayer);
             };
+
             
             displayController.displayBoard();
-
+            
             changeActivePlayer();
+        }
+        if (checkWinnerCount === 9) {
+            displayController.displayDraw();
         }
         console.log(`Turn: ${activePlayer.getName()} Marker: ${activePlayer.getMarker()}`);
     }
@@ -283,7 +300,7 @@ let gameController = (function() {
         });
     }
     
-    return {playRound, checkWinner, changeActivePlayer, playGame, setPlayerNames};
+    return {playRound, checkWinner, changeActivePlayer, playGame, setPlayerNames, resetCheckWinnerCount};
 }) ();
 
 startButton.addEventListener('click', () => {
@@ -302,3 +319,6 @@ ticTacBoard.addEventListener('click', (e) => {
         gameController.playRound(+ id);
     }
 });
+
+// TODO: draw condition
+// TODO: add playagain after displaying winner
