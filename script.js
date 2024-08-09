@@ -10,6 +10,7 @@ const resetButton = document.createElement('button');
 resetButton.classList.add('reset');
 resetButton.textContent = 'Reset';
 let markerContainers;
+const winnerDialog = document.querySelector('.winner-dialog');
 
 /* gameboard first
 ** gameboard is the representation of the state of the board
@@ -134,8 +135,13 @@ let displayController = (function() {
         buttonsContainer.replaceChild(resetButton, startButton);
     }
 
+    function displayWinner(player) {
+        winnerDialog.textContent = `Winner: ${player.getName()}`;
+        winnerDialog.showModal();
+    }
+
     // now, changing these functions to display in the DOM
-    return {displayBoard, swapButtons};
+    return {displayBoard, swapButtons, displayWinner};
 }) ();
 
 let gameController = (function() {
@@ -236,7 +242,7 @@ let gameController = (function() {
             
             // check to see the winner
             if (checkWinner()){
-                console.log(`Winner: ${activePlayer.getName()}`)
+                displayController.displayWinner(activePlayer);
             };
             
             displayController.displayBoard();
@@ -273,5 +279,3 @@ ticTacBoard.addEventListener('click', (e) => {
         gameController.playRound(+ id);
     }
 });
-//       asking them for the replay isn't necessary cause we'll do that with the ui
-// i can't change the position of changeactiveplayer() yet, but in the future, will do
