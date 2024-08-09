@@ -4,6 +4,11 @@
 const container = document.querySelector('.container');
 const ticTacBoard = document.createElement('div');
 ticTacBoard.classList.add('tictactoe-board');
+const buttonsContainer = document.querySelector('.buttons');
+const startButton = document.querySelector('.start');
+const resetButton = document.createElement('button');
+resetButton.classList.add('reset');
+resetButton.textContent = 'Reset';
 
 /* gameboard first
 ** gameboard is the representation of the state of the board
@@ -12,10 +17,11 @@ ticTacBoard.classList.add('tictactoe-board');
 let gameboard = (function() {
     let rows = 3;
     let columns = 3;
-    let board = [];
-
     // this array represents the state of the gameboard,
     // since state shouldn't be stored in the dom since that's not what its for
+    let board = [];
+
+    // initializing the gameboard
     function createBoard() {
         for (let i = 0; i < rows; i++) {
             board[i] = [];
@@ -24,9 +30,8 @@ let gameboard = (function() {
                 board[i].push(cell());
             }
         }
+        displayController.displayBoard();
     }
-
-    createBoard();
 
     function getBoard() {
         return board;
@@ -44,7 +49,17 @@ let gameboard = (function() {
         return marks;
     }
 
-    return {createBoard, getBoard, getBoardMarkers};
+    function resetBoard() {
+        board.forEach(row => {
+            row.forEach(cell => {
+                cell.resetMark();
+            })
+        });
+
+        displayController.displayBoard();
+    }
+
+    return {getBoard, getBoardMarkers, createBoard, resetBoard};
 }) ();
 
 // cell stores the state of the particular cell
@@ -55,10 +70,13 @@ function cell() {
             mark = myMark;
         }
     }
+    resetMark = () => {
+        mark = null;
+    }
     getMark = () => mark;
     isMarked = () => mark ? true : false;
 
-    return {getMark, setMark, isMarked};
+    return {getMark, setMark, isMarked, resetMark};
 }
 
 // player should be a new object controlled by gameController but not accessible by anyone else
@@ -67,6 +85,66 @@ function createPlayer(name, marker) {
     let getMarker = () => marker;
     return {name, marker, getName, getMarker};
 }
+
+let displayController = (function() {
+    // this we should probably get form the gameBoard rather than drawing it here
+    function displayBoard() {
+        // second time the child is appended, nothing significant change happens to the node
+        container.appendChild(ticTacBoard);
+        let board = gameboard.getBoard();
+
+        // clear the board first
+        let currentMarkers = Array.from(document.querySelectorAll('.tictactoe-board div'));
+        currentMarkers.forEach(div => {
+            ticTacBoard.removeChild(div);
+        });
+
+        board.forEach(row => {
+            row.forEach(cell => {
+                let markerContainer = document.createElement('div');
+                markerContainer.classList.add('marker-container');
+                markerContainer.setAttribute('id', `${3 * board.indexOf(row) + row.indexOf(cell) + 1}`)
+                
+                if (!cell.isMarked()) {
+                    markerContainer.textContent = ' ';
+                } else {
+                    markerContainer.textContent = cell.getMark();
+                }
+                ticTacBoard.appendChild(markerContainer);
+                
+                console.log(cell.getMark());
+            })
+        });
+    }
+
+    // only for console version
+    let positions = [];
+    for (let i = 0; i < 3; i++) {
+        let row = [];
+        for (let j = 0; j < 3; j++) {
+            row.push(3 * i + j + 1);
+        }
+        positions.push(row);
+    } 
+
+    function displayPositions() {
+        positions.forEach(row => {
+            console.log(row);
+        });
+    }
+
+    function getPositions() {
+        return positions;
+    }
+
+    // swaps the start and reset buttons
+    function swapButtons() {
+        buttonsContainer.replaceChild(resetButton, startButton);
+    }
+
+    // now, changing these functions to display in the DOM
+    return {displayBoard, displayPositions, getPositions, swapButtons};
+}) ();
 
 let gameController = (function() {
     let playerOne = createPlayer("PlayerOne", "x");
@@ -153,6 +231,8 @@ let gameController = (function() {
             }
         });
 
+        console.log(`${rowNumber}, ${cellNumber}`)
+        console.log(board)
         let cell = board[rowNumber][cellNumber];
 
         if (!cell.isMarked()) {
@@ -169,116 +249,71 @@ let gameController = (function() {
         }
         console.log(`Turn: ${activePlayer.getName()} Marker: ${activePlayer.getMarker()}`);
     }
-    
-    return {playRound, checkWinner, changeActivePlayer};
-}) ();
 
-let displayController = (function() {
-    // this we should probably get form the gameBoard rather than drawing it here
-    function displayBoard() {
-        container.appendChild(ticTacBoard);
-        let board = gameboard.getBoard();
-
-        // clear the board first
-        let currentMarkers = Array.from(document.querySelectorAll('.tictactoe-board div'));
-        currentMarkers.forEach(div => {
-            ticTacBoard.removeChild(div);
-        });
-
-        board.forEach(row => {
-            row.forEach(cell => {
-                let markerContainer = document.createElement('div');
-                markerContainer.classList.add('marker-container');
-                markerContainer.setAttribute('id', `${3 * board.indexOf(row) + row.indexOf(cell) + 1}`)
+    // and everything begins with playGame
+    function playGame() {
+        let count = 0;
+        let position;
+        gameboard.createBoard();
+        displayController.swapButtons();
+        
+        while(true && count < 9) {
+            do {
+                displayController.displayPositions();
                 
-                if (!cell.isMarked()) {
-                    markerContainer.textContent = ' ';
-                } else {
-                    markerContainer.textContent = cell.getMark();
+                // TODO: prompt is not allowing the displayBoard to display the content immediately
+                position = Number(prompt("Position (one from the console): "))
+                
+                // if user presses cancel, prompt returns 0
+                if (position === 0) {
+                    break;
                 }
-                ticTacBoard.appendChild(markerContainer);
+            } while (position > 9 || position < 1 || (position === ''));
+            if (position) {
+                gameController.playRound(position);
                 
-                console.log(cell.getMark());
-            })
-        });
-    }
-
-    // only for console version
-    let positions = [];
-    for (let i = 0; i < 3; i++) {
-        let row = [];
-        for (let j = 0; j < 3; j++) {
-            row.push(3 * i + j + 1);
-        }
-        positions.push(row);
-    } 
-
-    function displayPositions() {
-        positions.forEach(row => {
-            console.log(row);
-        });
-    }
-
-    function getPositions() {
-        return positions;
-    }
-
-
-    // now, changing these functions to display in the DOM
-    return {displayBoard, displayPositions, getPositions};
-}) ();
-
-// and everything begins with playGame
-function playGame() {
-    let count = 0;
-    let position;
-    console.log(gameboard.createBoard());
-    displayController.displayBoard();
-
-    while(true && count < 9) {
-        do {
-            displayController.displayPositions();
-            position = Number(prompt("Position (one from the console): "))
-            
-            // if user presses cancel, prompt returns 0
-            if (position === 0) {
+                // activePlayer gets changed every round at the end, so if you want to checkWinner for this, round
+                // you have to do this
+                gameController.changeActivePlayer()
+                if (gameController.checkWinner()) {
+                    break;
+                } 
+                
+                // count the number of marked cells each time
+                count = 0;
+                gameboard.getBoard().forEach(row => {
+                    row.forEach(cell => {
+                        if (cell.isMarked()) {
+                            count++;
+                        }
+                    })
+                })
+                gameController.changeActivePlayer()
+                
+            } else { /* if position null dincha bhane */
                 break;
             }
-        } while (position > 9 || position < 1 || (position === ''));
-        if (position) {
-            gameController.playRound(position);
-            
-            // activePlayer gets changed every round at the end, so if you want to checkWinner for this, round
-            // you have to do this
-            gameController.changeActivePlayer()
-            if (gameController.checkWinner()) {
-                break;
-            } 
-
-            // count the number of marked cells each time
-            count = 0;
-            gameboard.getBoard().forEach(row => {
-                row.forEach(cell => {
-                    if (cell.isMarked()) {
-                        count++;
-                    }
-                })
-            })
-            gameController.changeActivePlayer()
-            
-        } else { /* if position null dincha bhane */
-            break;
         }
+        
+        gameController.changeActivePlayer();
+        if (count === 9 && !gameController.checkWinner()) {
+            console.log("That was a draw!")
+        }
+        // if we've already broken out of the game, no need to change the active player again
+
+        console.log("Thanks for playing");
     }
     
-    gameController.changeActivePlayer();
-    if (count === 9 && !gameController.checkWinner()) {
-        console.log("That was a draw!")
-    }
-    // if we've already broken out of the game, no need to change the active player again
+    return {playRound, checkWinner, changeActivePlayer, playGame};
+}) ();
 
-    console.log("Thanks for playing");
-}
+startButton.addEventListener('click', () => {
+    displayController.displayBoard();
+    gameController.playGame();
+});
 
+resetButton.addEventListener('click', () => {
+    gameboard.resetBoard();
+})
 //       asking them for the replay isn't necessary cause we'll do that with the ui
 // i can't change the position of changeactiveplayer() yet, but in the future, will do
