@@ -136,14 +136,17 @@ let displayController = (function() {
     }
     
     // swaps the start and reset buttons
-    let swappedButton;
     function swapButtons() {
         let button = buttonsContainer.querySelector('button');
         if (button.getAttribute('class') === 'start') {
-            swappedButton = buttonsContainer.replaceChild(resetButton, startButton);
+            buttonsContainer.appendChild(resetButton);
+            buttonsContainer.removeChild(startButton);
         } else { /* if swappedbutton === resetbutton */
-            buttonsContainer.replaceChild(startButton, resetButton);
+            buttonsContainer.appendChild(startButton);
+            buttonsContainer.removeChild(resetButton);
         }
+        console.log(button);
+        console.log(buttonsContainer);
         console.log('buttons swapped')
     }
 
@@ -170,6 +173,21 @@ let gameController = (function() {
     let board = gameboard.getBoard();
     // required later in the draw case
     let checkWinnerCount = 0;
+    // prevent the default behaviour of submit, we're gonna do that
+    let playerNameSubmit = playerFormDialog.querySelector('.player-name-submit');
+    playerNameSubmit.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        // board is only created after the players have given their names
+        displayController.displayBoard();
+        gameboard.createBoard();
+        displayController.swapButtons();
+        
+        let player1 = playerFormDialog.querySelector('#player-one-name').value;
+        let player2 = playerFormDialog.querySelector('#player-one-name').value;
+        setPlayerNames(player1, player2);
+        playerFormDialog.close();
+    });
 
     function resetCheckWinnerCount() {
         checkWinnerCount = 0;
@@ -293,23 +311,7 @@ let gameController = (function() {
     // and everything begins with playGame
     function playGame() {
         playerFormDialog.showModal();
-
-        // prevent the default behaviour of submit, we're gonna do that
-        let playerNameSubmit = playerFormDialog.querySelector('.player-name-submit');
-        playerNameSubmit.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            // board is only created after the players have given their names
-            displayController.displayBoard();
-            gameboard.createBoard();
-            displayController.swapButtons();
-            
-            let player1 = playerFormDialog.querySelector('#player-one-name').value;
-            let player2 = playerFormDialog.querySelector('#player-one-name').value;
-            setPlayerNames(player1, player2);
-
-            playerFormDialog.close();
-        });
+        // rest of the work is done by modal button's event listener
     }
     
     return {playRound, checkWinner, changeActivePlayer, playGame, setPlayerNames, resetCheckWinnerCount};
@@ -347,4 +349,4 @@ document.addEventListener('DOMContentLoaded', () => {
     buttonsContainer.appendChild(startButton);
 })
 
-// TODO: add playagain after displaying winner
+// TODO: swapButtons doesn't work yet
