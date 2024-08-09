@@ -5,7 +5,9 @@ const container = document.querySelector('.container');
 const ticTacBoard = document.createElement('div');
 ticTacBoard.classList.add('tictactoe-board');
 const buttonsContainer = document.querySelector('.buttons');
-const startButton = document.querySelector('.start');
+const startButton = document.createElement('button');
+startButton.classList.add('start');
+startButton.textContent = 'Start';
 const resetButton = document.createElement('button');
 resetButton.classList.add('reset');
 resetButton.textContent = 'Reset';
@@ -110,7 +112,7 @@ let displayController = (function() {
         // second time the child is appended, nothing significant change happens to the node
         container.appendChild(ticTacBoard);
         let board = gameboard.getBoard();
-
+        
         // clear the board first
         let currentMarkers = Array.from(document.querySelectorAll('.tictactoe-board div'));
         currentMarkers.forEach(div => {
@@ -132,10 +134,17 @@ let displayController = (function() {
             })
         });
     }
-
+    
     // swaps the start and reset buttons
+    let swappedButton;
     function swapButtons() {
-        buttonsContainer.replaceChild(resetButton, startButton);
+        let button = buttonsContainer.querySelector('button');
+        if (button.getAttribute('class') === 'start') {
+            swappedButton = buttonsContainer.replaceChild(resetButton, startButton);
+        } else { /* if swappedbutton === resetbutton */
+            buttonsContainer.replaceChild(startButton, resetButton);
+        }
+        console.log('buttons swapped')
     }
 
     function displayWinner(player) {
@@ -327,9 +336,15 @@ winnerDialog.addEventListener('click', (e) => {
     if (Array.from(e.target.classList).includes('play-again-button')) {
         gameboard.resetBoard();
     } else if (Array.from(e.target.classList).includes('end-game-button')) {
+        gameboard.resetBoard();
         container.removeChild(ticTacBoard);
+        displayController.swapButtons();
     }
     winnerDialog.close();
+})
+
+document.addEventListener('DOMContentLoaded', () => {
+    buttonsContainer.appendChild(startButton);
 })
 
 // TODO: add playagain after displaying winner
