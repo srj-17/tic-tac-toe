@@ -50,6 +50,7 @@ let gameboard = (function() {
         });
         
         displayController.displayBoard();
+        // we need to reset the counter that we've been using to keep track of how many boxes have been marked
         gameController.resetCheckWinnerCount();
     }
 
@@ -138,12 +139,14 @@ let displayController = (function() {
     }
 
     function displayWinner(player) {
-        winnerDialog.textContent = `Winner: ${player.getName()}`;
+        message = winnerDialog.querySelector('.message');
+        message.textContent = `Winner: ${player.getName()}`;
         winnerDialog.showModal();
     }
-
+    
     function displayDraw() {
-        winnerDialog.textContent = `Draw`;
+        message = winnerDialog.querySelector('.message');
+        message.textContent = `Draw`;
         winnerDialog.showModal();
     }
 
@@ -320,5 +323,13 @@ ticTacBoard.addEventListener('click', (e) => {
     }
 });
 
-// TODO: draw condition
+winnerDialog.addEventListener('click', (e) => {
+    if (Array.from(e.target.classList).includes('play-again-button')) {
+        gameboard.resetBoard();
+    } else if (Array.from(e.target.classList).includes('end-game-button')) {
+        container.removeChild(ticTacBoard);
+    }
+    winnerDialog.close();
+})
+
 // TODO: add playagain after displaying winner
