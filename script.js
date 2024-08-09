@@ -11,6 +11,7 @@ resetButton.classList.add('reset');
 resetButton.textContent = 'Reset';
 let markerContainers;
 const winnerDialog = document.querySelector('.winner-dialog');
+const playerFormDialog = document.querySelector('.player-form-container');
 
 /* gameboard first
 ** gameboard is the representation of the state of the board
@@ -145,10 +146,18 @@ let displayController = (function() {
 }) ();
 
 let gameController = (function() {
-    let playerOne = createPlayer("PlayerOne", "x");
-    let playerTwo = createPlayer("PlayerTwo", "o");
-    let activePlayer = playerOne;    
+    let playerOne;
+    let playerTwo;
+    let activePlayer; 
     let board = gameboard.getBoard();
+    
+    function setPlayerNames(playerOneN, playerTwoN) {
+        let playerOneName = playerOneN || "PlayerOne";
+        let playerTwoName = playerTwoN || "PlayerTwo";
+        playerOne = createPlayer(playerOneName, "x");
+        playerTwo = createPlayer(playerTwoName, "o");
+        activePlayer = playerOne;    
+    }
 
     function changeActivePlayer() {
         activePlayer = (activePlayer === playerOne) ? playerTwo : playerOne;
@@ -254,16 +263,30 @@ let gameController = (function() {
 
     // and everything begins with playGame
     function playGame() {
-        let count = 0;
-        gameboard.createBoard();
-        displayController.swapButtons();
+        playerFormDialog.showModal();
+
+        // prevent the default behaviour of submit, we're gonna do that
+        let playerNameSubmit = playerFormDialog.querySelector('.player-name-submit');
+        playerNameSubmit.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // board is only created after the players have given their names
+            displayController.displayBoard();
+            gameboard.createBoard();
+            displayController.swapButtons();
+            
+            let player1 = playerFormDialog.querySelector('#player-one-name').value;
+            let player2 = playerFormDialog.querySelector('#player-one-name').value;
+            setPlayerNames(player1, player2);
+
+            playerFormDialog.close();
+        });
     }
     
-    return {playRound, checkWinner, changeActivePlayer, playGame};
+    return {playRound, checkWinner, changeActivePlayer, playGame, setPlayerNames};
 }) ();
 
 startButton.addEventListener('click', () => {
-    displayController.displayBoard();
     gameController.playGame();
 });
 
