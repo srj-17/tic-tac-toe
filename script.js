@@ -348,5 +348,3 @@ winnerDialog.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
     buttonsContainer.appendChild(startButton);
 })
-
-// TODO: swapButtons doesn't work yet
