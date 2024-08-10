@@ -344,12 +344,13 @@ ticTacBoard.addEventListener('click', (e) => {
 winnerDialog.addEventListener('click', (e) => {
     if (Array.from(e.target.classList).includes('play-again-button')) {
         gameboard.resetBoard();
+        winnerDialog.close();
     } else if (Array.from(e.target.classList).includes('end-game-button')) {
         gameboard.resetBoard();
         container.removeChild(ticTacBoard);
         displayController.swapButtons();
+        winnerDialog.close();
     }
-    winnerDialog.close();
 })
 
 document.addEventListener('DOMContentLoaded', () => {
