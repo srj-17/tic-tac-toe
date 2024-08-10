@@ -14,6 +14,7 @@ resetButton.textContent = 'Reset';
 let markerContainers;
 const winnerDialog = document.querySelector('.winner-dialog');
 const playerFormDialog = document.querySelector('.player-form-container');
+const currentPlayerDialog = document.querySelector('.current-player-dialog');
 
 /* gameboard first
 ** gameboard is the representation of the state of the board
@@ -169,8 +170,17 @@ let displayController = (function() {
         winnerDialog.showModal();
     }
 
+    function showPlayer(player, TIMEOUT_PERIOD) {
+        currentPlayerDialog.textContent = `Current player: ${player}`;
+        currentPlayerDialog.showModal();
+        
+        // settimeout can't be called directly like settimeout(currentplayerdialog.close, timeout)
+        // cause it changes the context of close execution
+        setTimeout(() => currentPlayerDialog.close(), TIMEOUT_PERIOD);
+    }
+
     // now, changing these functions to display in the DOM
-    return {displayBoard, swapButtons, displayWinner, displayDraw};
+    return {displayBoard, swapButtons, displayWinner, displayDraw, showPlayer};
 }) ();
 
 let gameController = (function() {
@@ -178,6 +188,7 @@ let gameController = (function() {
     let playerTwo;
     let activePlayer; 
     let board = gameboard.getBoard();
+    const TIMEOUT_PERIOD = 1000;
     // required later in the draw case
     let checkWinnerCount = 0;
     // prevent the default behaviour of submit, we're gonna do that
@@ -194,6 +205,9 @@ let gameController = (function() {
         let player2 = playerFormDialog.querySelector('#player-one-name').value;
         setPlayerNames(player1, player2);
         playerFormDialog.close();
+
+        // show the first player for TIMEOUT_PERIOD and then create the board 
+        displayController.showPlayer(activePlayer.getName(), TIMEOUT_PERIOD);
     });
 
     function resetCheckWinnerCount() {
@@ -320,8 +334,18 @@ let gameController = (function() {
         playerFormDialog.showModal();
         // rest of the work is done by modal button's event listener
     }
+
+    function getActivePlayer() {
+        return activePlayer;
+    }
+
+    function getTimeOutTime() {
+        return TIMEOUT_PERIOD;
+    }
     
-    return {playRound, checkWinner, changeActivePlayer, playGame, setPlayerNames, resetCheckWinnerCount};
+    return {playRound, checkWinner, changeActivePlayer, 
+            playGame, setPlayerNames, resetCheckWinnerCount, 
+            getActivePlayer, getTimeOutTime};
 }) ();
 
 startButton.addEventListener('click', () => {
@@ -330,6 +354,7 @@ startButton.addEventListener('click', () => {
 
 resetButton.addEventListener('click', () => {
     gameboard.resetBoard();
+    displayController.showPlayer(gameController.getActivePlayer().getName(), gameController.getTimeOutTime());
 })
 
 ticTacBoard.addEventListener('click', (e) => {
@@ -345,6 +370,7 @@ winnerDialog.addEventListener('click', (e) => {
     if (Array.from(e.target.classList).includes('play-again-button')) {
         gameboard.resetBoard();
         winnerDialog.close();
+        displayController.showPlayer(gameController.getActivePlayer().getName(), gameController.getTimeOutTime());
     } else if (Array.from(e.target.classList).includes('end-game-button')) {
         gameboard.resetBoard();
         container.removeChild(ticTacBoard);
