@@ -2,7 +2,7 @@
     --header-font: "Grey Qo", cursive;
     --tic-tac-font: "Merriweather", serif;
     --primary-font: "Lato", sans-serif;
-    
+
     --background: #294C60;
     --primary: #ADB6C4;
     --text: #FFEFD3;
@@ -37,7 +37,7 @@ body {
     border: 0;
     border-radius: 12px;
     padding: 2px 30px;
-    
+
     font-size: 1.1rem;
     font-weight: bold;
 }
@@ -52,7 +52,7 @@ body {
 }
 
 .buttons .reset {
-    background-color: #E03616; 
+    background-color: #E03616;
 }
 
 .buttons .reset:active {
@@ -61,7 +61,7 @@ body {
 
 .tictactoe-board {
     padding: 0;
-    
+
     display: grid;
     grid-template: repeat(3, max(10vw, 60px)) / repeat(3, max(10vw, 60px));
     justify-content: center;
@@ -73,14 +73,20 @@ body {
     place-content: center;
     width: 100%;
     height: 100%;
-    padding: 10px;
-    
+
     background-color: var(--primary);
     border-radius: 5px;
-    /* calculated according to the grid-template of parent */
-    font-size: calc(0.6 * max(10vw, 60px));
-    line-height: 1;
-    font-family: var(--tic-tac-font);
+}
+
+.marker-container svg {
+    width: max(8vw, 60px);
+    height: max(8vw, 60px);
+    fill: var(--text)
+}
+
+.marker-container path {
+    stroke: var(--text);
+    stroke-width: 70px;
 }
 
 .marker-container:active {
@@ -89,4 +95,84 @@ body {
 
 dialog {
     margin: auto;
+    background-color: var(--primary);
+    border: 3px solid var(--secondary);
+    border-radius: 10px;
+    padding: 10px; 
+}
+
+form.player-names {
+    display: grid;
+    gap: 14px;
+}
+
+.player {
+    display: grid;
+    gap: 3px;
+}
+
+.player input[type="text"] {
+    background-color: #1f3d4f8c;
+    outline: none;
+    border: 0;
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-weight: bolder;
+    font-size: 1rem;
+}
+
+.player input[type="text"]:focus {
+    background-color: #133043;
+}
+
+.player-name {
+    font-weight: bold;
+    color: #222;
+    font-size: 1.1rem;
+}
+
+button.player-name-submit {
+    border: 0;
+    background-color: var(--secondary);
+    padding: 4px 40px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    font-family: var(--tic-tac-font);
+    border-radius: 20px;
+}
+
+button.player-name-submit:active {
+    background-color: #E03616;
+}
+
+.winner-dialog-content {
+    display: grid;
+    gap: 4px;
+}
+
+.winner-dialog .message {
+    font-size: 2rem;
+    font-family: var(--tic-tac-font);
+    font-weight: bold;
+    color: #222;
+    text-shadow: var(--secondary) 2px 2px 5px;
+}
+
+.winner-dialog-buttons button {
+    color: var(--secondary);
+    background-color: var(--text);
+    font-weight: bold;
+    font-size: 1.3rem;
+    border: 0;
+    border-radius: 10px;
+    padding: 2px 20px;
+}
+
+.winner-dialog-buttons .play-again-button {
+    background-color: var(--secondary);
+    color: var(--text);
+}
+
+::backdrop {
+    backdrop-filter: blur(2px);
 }
