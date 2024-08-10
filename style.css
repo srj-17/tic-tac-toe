@@ -1,35 +1,90 @@
+:root {
+    --header-font: "Grey Qo", cursive;
+    --tic-tac-font: "Merriweather", serif;
+    --primary-font: "Lato", sans-serif;
+    
+    --background: #294C60;
+    --primary: #ADB6C4;
+    --text: #FFEFD3;
+    --secondary: #EB5E55;
+    /* --accent:  */
+}
+
 * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    color: var(--text);
+}
+
+body {
+    background-color: var(--background);
 }
 
 .container {
     display: grid;
-    justify-content: center;
+    gap: 5px;
     text-align: center;
     padding: 40px;
 }
 
+.header {
+    font-family: var(--header-font);
+    font-size: 4rem;
+}
+
+.buttons button {
+    border: 0;
+    border-radius: 12px;
+    padding: 2px 30px;
+    
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.buttons .start {
+    background-color: #6DA34D;
+}
+
+.buttons .start:active {
+    background-color: var(--secondary);
+    color: #222;
+}
+
+.buttons .reset {
+    background-color: #E03616; 
+}
+
+.buttons .reset:active {
+    background-color: #24b4d1;
+}
+
 .tictactoe-board {
     padding: 0;
+    
     display: grid;
-    grid-template: repeat(3, 60px) / repeat(3, 60px);
-    place-content: center;
-    place-items: center;
+    grid-template: repeat(3, max(10vw, 60px)) / repeat(3, max(10vw, 60px));
+    justify-content: center;
     gap: 5px;
-
-    background-color: rgba(85, 78, 78, 0.274);
 }
 
 .marker-container {
     display: grid;
     place-content: center;
-    gap: 10px;
     width: 100%;
     height: 100%;
+    padding: 10px;
+    
+    background-color: var(--primary);
+    border-radius: 5px;
+    /* calculated according to the grid-template of parent */
+    font-size: calc(0.6 * max(10vw, 60px));
+    line-height: 1;
+    font-family: var(--tic-tac-font);
+}
 
-    background-color: skyblue;
+.marker-container:active {
+    background-color: var(--secondary);
 }
 
 dialog {
