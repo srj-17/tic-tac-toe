@@ -176,3 +176,16 @@ button.player-name-submit:active {
 ::backdrop {
     backdrop-filter: blur(2px);
 }
+
+.current-player-dialog {
+    background-color: var(--background);
+    opacity: 0.9;
+    border: 0;
+    color: var(--secondary);
+    font-weight: bold;
+    font-size: 2rem;
+}
+
+.current-player-dialog::backdrop {
+    backdrop-filter: blur(8px);
+}

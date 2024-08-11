@@ -20,7 +20,7 @@ const currentPlayerDialog = document.querySelector('.current-player-dialog');
 ** gameboard is the representation of the state of the board
 ** and some other things
 */
-let gameboard = (function() {
+let gameboard = (function () {
     let rows = 3;
     let columns = 3;
     // this array represents the state of the gameboard,
@@ -51,7 +51,7 @@ let gameboard = (function() {
                 cell.resetMark();
             })
         });
-        
+
         displayController.displayBoard();
         // we need to reset the counter that we've been using to keep track of how many boxes have been marked
         gameController.resetCheckWinnerCount();
@@ -64,14 +64,14 @@ let gameboard = (function() {
             row.push(3 * i + j + 1);
         }
         positions.push(row);
-    } 
+    }
 
     function getPositions() {
         return positions;
     }
 
-    return {getBoard, createBoard, resetBoard, getPositions};
-}) ();
+    return { getBoard, createBoard, resetBoard, getPositions };
+})();
 
 // cell stores the state of the particular cell
 function cell() {
@@ -82,38 +82,38 @@ function cell() {
             mark = myMark;
         }
     }
-    
+
     let resetMark = () => {
         mark = null;
     }
-    
+
     let setPosition = (x) => {
         position = x;
     }
-    
+
     let getPosition = () => position;
 
     let getMark = () => mark;
-    
+
     let isMarked = () => mark ? true : false;
 
-    return {getMark, setMark, isMarked, resetMark, setPosition, getPosition};
+    return { getMark, setMark, isMarked, resetMark, setPosition, getPosition };
 }
 
 // player should be a new object controlled by gameController but not accessible by anyone else
 function createPlayer(name, marker) {
     let getName = () => name;
     let getMarker = () => marker;
-    return {name, marker, getName, getMarker};
+    return { name, marker, getName, getMarker };
 }
 
-let displayController = (function() {
+let displayController = (function () {
     // this we should probably get form the gameBoard rather than drawing it here
     function displayBoard() {
         // second time the child is appended, nothing significant change happens to the node
         container.appendChild(ticTacBoard);
         let board = gameboard.getBoard();
-        
+
         // clear the board first
         let currentMarkers = Array.from(document.querySelectorAll('.tictactoe-board div'));
         currentMarkers.forEach(div => {
@@ -125,7 +125,7 @@ let displayController = (function() {
                 let markerContainer = document.createElement('div');
                 markerContainer.classList.add('marker-container');
                 markerContainer.setAttribute('id', `${3 * board.indexOf(row) + row.indexOf(cell) + 1}`)
-                
+
                 if (!cell.isMarked()) {
                     markerContainer.textContent = ' ';
                 } else {
@@ -142,7 +142,7 @@ let displayController = (function() {
             })
         });
     }
-    
+
     // swaps the start and reset buttons
     function swapButtons() {
         let button = buttonsContainer.querySelector('button');
@@ -163,7 +163,7 @@ let displayController = (function() {
         message.textContent = `Winner: ${player.getName()}`;
         winnerDialog.showModal();
     }
-    
+
     function displayDraw() {
         message = winnerDialog.querySelector('.message');
         message.textContent = `Draw`;
@@ -173,20 +173,20 @@ let displayController = (function() {
     function showPlayer(player, TIMEOUT_PERIOD) {
         currentPlayerDialog.textContent = `Current player: ${player}`;
         currentPlayerDialog.showModal();
-        
+
         // settimeout can't be called directly like settimeout(currentplayerdialog.close, timeout)
         // cause it changes the context of close execution
         setTimeout(() => currentPlayerDialog.close(), TIMEOUT_PERIOD);
     }
 
     // now, changing these functions to display in the DOM
-    return {displayBoard, swapButtons, displayWinner, displayDraw, showPlayer};
-}) ();
+    return { displayBoard, swapButtons, displayWinner, displayDraw, showPlayer };
+})();
 
-let gameController = (function() {
+let gameController = (function () {
     let playerOne;
     let playerTwo;
-    let activePlayer; 
+    let activePlayer;
     let board = gameboard.getBoard();
     const TIMEOUT_PERIOD = 1000;
     // required later in the draw case
@@ -200,9 +200,9 @@ let gameController = (function() {
         displayController.displayBoard();
         gameboard.createBoard();
         displayController.swapButtons();
-        
+
         let player1 = playerFormDialog.querySelector('#player-one-name').value;
-        let player2 = playerFormDialog.querySelector('#player-one-name').value;
+        let player2 = playerFormDialog.querySelector('#player-two-name').value;
         setPlayerNames(player1, player2);
         playerFormDialog.close();
 
@@ -213,13 +213,13 @@ let gameController = (function() {
     function resetCheckWinnerCount() {
         checkWinnerCount = 0;
     }
-    
+
     function setPlayerNames(playerOneN, playerTwoN) {
         let playerOneName = playerOneN || "PlayerOne";
         let playerTwoName = playerTwoN || "PlayerTwo";
         playerOne = createPlayer(playerOneName, "x");
         playerTwo = createPlayer(playerTwoName, "o");
-        activePlayer = playerOne;    
+        activePlayer = playerOne;
     }
 
     function changeActivePlayer() {
@@ -261,7 +261,7 @@ let gameController = (function() {
             for (let i = 0; i < boardMarkers.length; i++) {
                 for (let j = 0; j < boardMarkers.length; j++) {
                     if (boardMarkers[i][j] === marker) {
-                        colCount[j] ++;
+                        colCount[j]++;
                     }
                 }
             }
@@ -278,7 +278,7 @@ let gameController = (function() {
             for (let i = 0; i < boardMarkers.length; i++) {
                 if (marker === boardMarkers[i][i]) {
                     mainDiagonalCount++;
-                } 
+                }
                 if (marker === boardMarkers.at(i).at(boardMarkers.length - i - 1)) {
                     crossDiagonalCount++;
                 }
@@ -293,7 +293,7 @@ let gameController = (function() {
         // checkwinner returns true if any of them return true
         return rowCheck() || columnCheck() || diagonalCheck();
     }
-    
+
     function playRound(position) {
         // only for the console, I'spose
         let board = gameboard.getBoard();
@@ -311,16 +311,16 @@ let gameController = (function() {
 
         if (!cell.isMarked()) {
             cell.setMark(activePlayer.getMarker());
-            
+
             // check to see the winner
             checkWinnerCount++;
-            if (checkWinner()){
+            if (checkWinner()) {
                 displayController.displayWinner(activePlayer);
                 console.log('working')
             };
-            
+
             displayController.displayBoard();
-            
+
             changeActivePlayer();
         }
         if (checkWinnerCount === 9) {
@@ -342,11 +342,13 @@ let gameController = (function() {
     function getTimeOutTime() {
         return TIMEOUT_PERIOD;
     }
-    
-    return {playRound, checkWinner, changeActivePlayer, 
-            playGame, setPlayerNames, resetCheckWinnerCount, 
-            getActivePlayer, getTimeOutTime};
-}) ();
+
+    return {
+        playRound, checkWinner, changeActivePlayer,
+        playGame, setPlayerNames, resetCheckWinnerCount,
+        getActivePlayer, getTimeOutTime
+    };
+})();
 
 startButton.addEventListener('click', () => {
     gameController.playGame();
@@ -383,4 +385,4 @@ document.addEventListener('DOMContentLoaded', () => {
     buttonsContainer.appendChild(startButton);
 })
 
-// TODO: winnerDialog is not closing, unexpectedly, idk what's wrong
+// TODO: styling the current player dialogs (transparent, maybe if you can)
