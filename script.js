@@ -1,6 +1,3 @@
-// make a working project in the console first with foundations laid out
-// foundations -> gameboard, cell, gamecontroller
-
 const container = document.querySelector('.container');
 const ticTacBoard = document.createElement('div');
 ticTacBoard.classList.add('tictactoe-board');
@@ -16,10 +13,7 @@ const winnerDialog = document.querySelector('.winner-dialog');
 const playerFormDialog = document.querySelector('.player-form-container');
 const currentPlayerDialog = document.querySelector('.current-player-dialog');
 
-/* gameboard first
-** gameboard is the representation of the state of the board
-** and some other things
-*/
+// gameboard is the representation of the state of the board
 let gameboard = (function () {
     let rows = 3;
     let columns = 3;
@@ -108,7 +102,6 @@ function createPlayer(name, marker) {
 }
 
 let displayController = (function () {
-    // this we should probably get form the gameBoard rather than drawing it here
     function displayBoard() {
         // second time the child is appended, nothing significant change happens to the node
         container.appendChild(ticTacBoard);
@@ -131,6 +124,7 @@ let displayController = (function () {
                 } else {
                     mark = cell.getMark();
                     if (mark === 'x') {
+                        // these are the svg's for x and o marks
                         markerContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
                                                     </svg>`
                     } else {
@@ -153,9 +147,6 @@ let displayController = (function () {
             buttonsContainer.appendChild(startButton);
             buttonsContainer.removeChild(resetButton);
         }
-        console.log(button);
-        console.log(buttonsContainer);
-        console.log('buttons swapped')
     }
 
     function displayWinner(player) {
@@ -189,7 +180,6 @@ let gameController = (function () {
     let activePlayer;
     let board = gameboard.getBoard();
     const TIMEOUT_PERIOD = 1000;
-    // required later in the draw case
     let checkWinnerCount = 0;
     // prevent the default behaviour of submit, we're gonna do that
     let playerNameSubmit = playerFormDialog.querySelector('.player-name-submit');
@@ -255,7 +245,6 @@ let gameController = (function () {
         }
 
         // for the columns
-        // this freaking thing is not working
         function columnCheck() {
             let colCount = [0, 0, 0];
             for (let i = 0; i < boardMarkers.length; i++) {
@@ -295,7 +284,6 @@ let gameController = (function () {
     }
 
     function playRound(position) {
-        // only for the console, I'spose
         let board = gameboard.getBoard();
         let positions = gameboard.getPositions();
         let rowNumber;
@@ -316,7 +304,6 @@ let gameController = (function () {
             checkWinnerCount++;
             if (checkWinner()) {
                 displayController.displayWinner(activePlayer);
-                console.log('working')
             };
 
             displayController.displayBoard();
@@ -326,7 +313,6 @@ let gameController = (function () {
         if (checkWinnerCount === 9) {
             displayController.displayDraw();
         }
-        console.log(`Turn: ${activePlayer.getName()} Marker: ${activePlayer.getMarker()}`);
     }
 
     // and everything begins with playGame
@@ -348,7 +334,7 @@ let gameController = (function () {
         playGame, setPlayerNames, resetCheckWinnerCount,
         getActivePlayer, getTimeOutTime
     };
-})();
+}) ();
 
 startButton.addEventListener('click', () => {
     gameController.playGame();
@@ -384,5 +370,3 @@ winnerDialog.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
     buttonsContainer.appendChild(startButton);
 })
-
-// TODO: styling the current player dialogs (transparent, maybe if you can)
