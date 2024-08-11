@@ -321,18 +321,36 @@ let gameController = (function () {
         // rest of the work is done by modal button's event listener
     }
 
-    function getActivePlayer() {
-        return activePlayer;
+    function resetButtonHandler() {
+        gameboard.resetBoard();
+        displayController.showPlayer(activePlayer.getName(), TIMEOUT_PERIOD);    
     }
 
-    function getTimeOutTime() {
-        return TIMEOUT_PERIOD;
+    function ticTacBoardClickHandler(e) {
+        let markerContainers = Array.from(ticTacBoard.querySelectorAll('.marker-container'));
+        let markerContainer = e.target;
+        if (markerContainers.includes(markerContainer)) {
+            let id = markerContainer.getAttribute('id');
+            playRound(+ id);
+        }    
+    }
+
+    function winnerHandler(e) {
+        if (Array.from(e.target.classList).includes('play-again-button')) {
+            gameboard.resetBoard();
+            winnerDialog.close();
+            displayController.showPlayer(activePlayer.getName(), TIMEOUT_PERIOD);
+        } else if (Array.from(e.target.classList).includes('end-game-button')) {
+            gameboard.resetBoard();
+            container.removeChild(ticTacBoard);
+            displayController.swapButtons();
+            winnerDialog.close();
+        }    
     }
 
     return {
-        playRound, checkWinner, changeActivePlayer,
-        playGame, setPlayerNames, resetCheckWinnerCount,
-        getActivePlayer, getTimeOutTime
+        playGame, resetCheckWinnerCount, resetButtonHandler,
+        ticTacBoardClickHandler, winnerHandler
     };
 }) ();
 
@@ -341,32 +359,17 @@ startButton.addEventListener('click', () => {
 });
 
 resetButton.addEventListener('click', () => {
-    gameboard.resetBoard();
-    displayController.showPlayer(gameController.getActivePlayer().getName(), gameController.getTimeOutTime());
+    gameController.resetButtonHandler();
 })
 
 ticTacBoard.addEventListener('click', (e) => {
-    let markerContainers = Array.from(ticTacBoard.querySelectorAll('.marker-container'));
-    let markerContainer = e.target;
-    if (markerContainers.includes(markerContainer)) {
-        let id = markerContainer.getAttribute('id');
-        gameController.playRound(+ id);
-    }
+    gameController.ticTacBoardClickHandler(e);
 });
 
 winnerDialog.addEventListener('click', (e) => {
-    if (Array.from(e.target.classList).includes('play-again-button')) {
-        gameboard.resetBoard();
-        winnerDialog.close();
-        displayController.showPlayer(gameController.getActivePlayer().getName(), gameController.getTimeOutTime());
-    } else if (Array.from(e.target.classList).includes('end-game-button')) {
-        gameboard.resetBoard();
-        container.removeChild(ticTacBoard);
-        displayController.swapButtons();
-        winnerDialog.close();
-    }
-})
+    gameController.winnerHandler(e);
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     buttonsContainer.appendChild(startButton);
-})
+});
