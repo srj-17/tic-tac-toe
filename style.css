@@ -88,7 +88,11 @@ body {
     stroke-width: 70px;
 }
 
-.marker-container:active {
+.marker-container:hover {
+    background-color: #16344761;
+}
+
+.marker-container:active:hover {
     background-color: var(--secondary);
 }
 
@@ -167,9 +171,17 @@ button.player-name-submit:active {
     padding: 2px 20px;
 }
 
+.winner-dialog-buttons button:active {
+    background-color: #ffffff;
+}
+
 .winner-dialog-buttons .play-again-button {
     background-color: var(--secondary);
     color: var(--text);
+}
+
+.winner-dialog-buttons .play-again-button:active {
+    background-color: #ef4337;
 }
 
 ::backdrop {
